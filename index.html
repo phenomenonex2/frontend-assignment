@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auto Delete Todo List</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 24px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .column {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      min-height: 360px;
+    }
+
+    .column h2 {
+      margin: 0;
+      padding: 12px;
+      text-align: center;
+      background: #f3f3f3;
+      border-radius: 8px 8px 0 0;
+      font-size: 1rem;
+    }
+
+    .items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+    }
+
+    button {
+      padding: 10px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background: #eef;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="board">
+    <section class="column">
+      <h2>List</h2>
+      <div class="items" id="list"></div>
+    </section>
+    <section class="column">
+      <h2>Fruit</h2>
+      <div class="items" id="Fruit"></div>
+    </section>
+    <section class="column">
+      <h2>Vegetable</h2>
+      <div class="items" id="Vegetable"></div>
+    </section>
+  </div>
+
+  <script>
+    const RETURN_DELAY_MS = 5000;
+
+    const items = [
+      ['Fruit', 'Apple'], ['Vegetable', 'Broccoli'], ['Vegetable', 'Mushroom'],
+      ['Fruit', 'Banana'], ['Vegetable', 'Tomato'], ['Fruit', 'Orange'],
+      ['Fruit', 'Mango'], ['Fruit', 'Pineapple'], ['Vegetable', 'Cucumber'],
+      ['Fruit', 'Watermelon'], ['Vegetable', 'Carrot'],
+    ].map(([type, name]) => ({ type, name, placed: false, timer: null }));
+
+    const columns = {
+      list: document.getElementById('list'),
+      Fruit: document.getElementById('Fruit'),
+      Vegetable: document.getElementById('Vegetable'),
+    };
+
+    function moveToList(item) {
+      clearTimeout(item.timer);
+      item.placed = false;
+      items.push(...items.splice(items.indexOf(item), 1)); // back to the bottom of the list
+      render();
+    }
+
+    function moveToColumn(item) {
+      item.placed = true;
+      item.timer = setTimeout(() => moveToList(item), RETURN_DELAY_MS);
+      render();
+    }
+
+    function render() {
+      for (const el of Object.values(columns)) el.replaceChildren();
+
+      for (const item of items.filter(i => !i.placed)) {
+        columns.list.append(makeButton(item, () => moveToColumn(item)));
+      }
+      for (const item of items.filter(i => i.placed)) {
+        columns[item.type].append(makeButton(item, () => moveToList(item)));
+      }
+    }
+
+    function makeButton(item, onClick) {
+      const btn = document.createElement('button');
+      btn.textContent = item.name;
+      btn.addEventListener('click', onClick);
+      return btn;
+    }
+
+    render();
+  </script>
+</body>
+
+</html>

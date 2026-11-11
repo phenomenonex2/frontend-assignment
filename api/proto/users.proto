@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package users;
+
+service UserService {
+  rpc GetDepartmentSummary(Empty) returns (SummaryResponse);
+}
+
+message Empty {}
+
+message SummaryResponse {
+  map<string, DepartmentSummary> departments = 1;
+}
+
+message DepartmentSummary {
+  int32 male = 1;
+  int32 female = 2;
+  string ageRange = 3;
+  map<string, int32> hair = 4;
+  map<string, string> addressUser = 5;
+}

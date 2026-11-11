@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Users by Department</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 24px; background: #fafafa; color: #222; }
+  h1 { text-align: center; }
+  #status { text-align: center; color: #666; }
+  #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; max-width: 1200px; margin: 0 auto; }
+  .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 16px; }
+  .card h2 { margin: 0 0 8px; font-size: 1.1rem; }
+  .stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .stat { background: #f0f0f5; border-radius: 6px; padding: 4px 10px; font-size: .9rem; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tag { border: 1px solid #ccc; border-radius: 12px; padding: 2px 8px; font-size: .8rem; }
+  details summary { cursor: pointer; font-size: .9rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; margin-top: 6px; }
+  td { padding: 2px 4px; border-bottom: 1px solid #eee; }
+  td:last-child { text-align: right; }
+</style>
+</head>
+<body>
+<h1>Users by Department</h1>
+<p id="status">Loading…</p>
+<div id="grid"></div>
+
+<script>
+const grid = document.getElementById('grid');
+const status = document.getElementById('status');
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function renderCard(department, { male, female, ageRange, hair, addressUser }) {
+  const card = el('section', 'card');
+  card.append(el('h2', '', department));
+
+  const stats = el('div', 'stats');
+  for (const text of [`Male: ${male}`, `Female: ${female}`, `Age: ${ageRange}`]) stats.append(el('span', 'stat', text));
+  card.append(stats);
+
+  const tags = el('div', 'tags');
+  for (const [color, count] of Object.entries(hair)) tags.append(el('span', 'tag', `${color}: ${count}`));
+  card.append(tags);
+
+  const users = Object.entries(addressUser);
+  const details = el('details');
+  details.append(el('summary', '', `Users (${users.length})`));
+  const table = el('table');
+  for (const [name, postalCode] of users) {
+    const row = table.insertRow();
+    row.insertCell().textContent = name;
+    row.insertCell().textContent = postalCode;
+  }
+  details.append(table);
+  card.append(details);
+  return card;
+}
+
+fetch('/users/summary')
+  .then(res => { if (!res.ok) throw new Error(res.status); return res.json(); })
+  .then(data => {
+    status.hidden = true;
+    for (const [department, summary] of Object.entries(data)) grid.append(renderCard(department, summary));
+  })
+  .catch(err => { status.textContent = `Failed to load data (${err.message})`; });
+</script>
+</body>
+</html>

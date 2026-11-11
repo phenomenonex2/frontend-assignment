@@ -1,0 +1,25 @@
+{
+  "name": "users-by-department",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "dev:grpc": "tsx src/grpc-server.ts",
+    "start:grpc": "node dist/grpc-server.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.7",
+    "@grpc/proto-loader": "^0.8.1",
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}
